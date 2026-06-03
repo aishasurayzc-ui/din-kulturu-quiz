@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Din Kültürü Quiz</title>
+<style>
+:root{
+  --bg:#040e1f;--card:#0b1a35;--card2:#0f2040;
+  --blue:#1e3a8a;--blue-lt:#3b82f6;--blue-pale:#1a2f5e;
+  --gold:#f59e0b;--gold-dk:#d97706;
+  --green:#10b981;--green-bg:#022c22;
+  --red:#ef4444;--red-bg:#2d0a0a;
+  --text:#e2e8f0;--dim:#94a3b8;--border:#1e3a6e;
+  --sh:0 8px 32px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#020a18,#0d2152);padding:18px 20px 0;text-align:center;border-bottom:1px solid var(--border)}
+.hdr h1{color:#fff;font-size:1.3rem;font-weight:800}
+.hdr .prep{color:var(--gold);font-size:.8rem;font-weight:600;margin-top:3px}
+.hdr .sub{color:var(--dim);font-size:.75rem;margin-top:2px}
+.tabs{display:flex;justify-content:center;gap:4px;margin-top:14px}
+.tab{padding:9px 26px;border:none;border-radius:10px 10px 0 0;background:rgba(255,255,255,.07);color:var(--dim);font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s}
+.tab.active{background:var(--gold);color:#020a18}
+
+/* WRAP */
+.wrap{max-width:660px;margin:0 auto;padding:18px 14px 50px}
+
+/* PROGRESS */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.qlabel{background:var(--blue);color:#fff;font-size:.71rem;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.prog-track{flex:1;height:8px;background:var(--blue-pale);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue-lt),var(--gold));border-radius:4px;transition:width .4s cubic-bezier(.4,0,.2,1);width:0%}
+.spill{background:var(--gold);color:#020a18;font-size:.71rem;font-weight:800;padding:4px 12px;border-radius:20px;white-space:nowrap}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--sh);overflow:hidden;animation:cIn .3s ease}
+@keyframes cIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* CAT MASCOT STRIP */
+.mstrip{background:linear-gradient(135deg,#020a18,#0d2152);padding:14px 18px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border)}
+.cat-box{flex-shrink:0;width:78px;height:88px}
+.cat-box svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 10px rgba(0,0,0,.5))}
+.cat-box.bounce{animation:catB .5s cubic-bezier(.36,.07,.19,.97)}
+.cat-box.shake {animation:catS .45s cubic-bezier(.36,.07,.19,.97)}
+@keyframes catB{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-12px) scale(1.08)}65%{transform:translateY(-4px) scale(1.03)}}
+@keyframes catS{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(4deg)}}
+.mmsg{color:#fff}.mmsg .hi{font-size:.9rem;font-weight:700}.mmsg .lo{font-size:.74rem;color:var(--dim);margin-top:2px}
+
+/* PARA */
+.para-lbl{background:var(--blue-pale);border-left:3px solid var(--blue-lt);padding:6px 14px;margin:14px 20px 4px;font-size:.69rem;font-weight:700;color:var(--blue-lt);text-transform:uppercase;letter-spacing:.4px;border-radius:0 5px 5px 0}
+.para-box{background:#071020;border:1px solid var(--border);border-radius:8px;margin:0 20px 12px;padding:12px 15px;font-size:.85rem;line-height:1.72;color:#c8d8f0}
+
+/* CARD BODY */
+.cbody{padding:16px 20px 12px}
+.qtag{display:inline-block;background:var(--blue-pale);color:var(--blue-lt);font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.ayet-box{background:#071020;border-left:3px solid var(--gold);border-radius:0 7px 7px 0;padding:9px 12px;margin-bottom:10px;font-size:.86rem;font-style:italic;line-height:1.65;color:#d4b87a}
+.ayet-box .ref{font-style:normal;font-weight:700;font-size:.72rem;color:var(--gold);margin-top:4px;display:block}
+.qtext{font-size:.95rem;font-weight:700;line-height:1.5;margin-bottom:12px;color:var(--text)}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);cursor:pointer;font-size:.87rem;line-height:1.44;text-align:left;transition:all .15s;width:100%;color:var(--text)}
+.opt:not(.locked):hover{background:var(--blue-pale);border-color:var(--blue-lt);transform:translateX(4px)}
+.okey{min-width:23px;height:23px;border-radius:50%;background:var(--blue-pale);color:var(--blue-lt);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.opt.correct{background:var(--green-bg);border-color:var(--green);animation:pulse .3s}
+.opt.correct .okey{background:var(--green);color:#fff}
+.opt.wrong{background:var(--red-bg);border-color:var(--red);animation:jig .3s}
+.opt.wrong .okey{background:var(--red);color:#fff}
+.opt.locked{cursor:default}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.01)}}
+@keyframes jig{0%,100%{transform:translateX(0)}30%{transform:translateX(-5px)}70%{transform:translateX(5px)}}
+
+/* FEEDBACK */
+.fbbar{display:none;margin:8px 20px 0;padding:7px 12px;border-radius:6px;font-size:.82rem;font-weight:700;align-items:center;gap:7px}
+.fbbar.ok {display:flex;background:var(--green-bg);color:var(--green);border:1px solid var(--green)}
+.fbbar.bad{display:flex;background:var(--red-bg);color:var(--red);border:1px solid var(--red)}
+
+/* NAV */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 14px;border-top:1px solid var(--border)}
+.nb{padding:9px 18px;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .18s}
+.nb.prev{background:var(--blue-pale);color:var(--blue-lt)}
+.nb.prev:hover{background:#1e3a8a}
+.nb.next{background:var(--blue);color:#fff;min-width:124px;text-align:center}
+.nb.next:hover{background:var(--blue-lt);transform:translateY(-1px)}
+.nb:disabled{opacity:.3;cursor:default;transform:none!important}
+
+/* DOTS */
+.dots{display:flex;gap:3px;flex-wrap:wrap;max-width:200px;justify-content:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all .2s}
+.dot.cur{background:var(--gold);transform:scale(1.5)}
+.dot.ok {background:var(--green)}
+.dot.bad{background:var(--red)}
+.dot.seen{background:var(--blue-pale)}
+
+/* RESULTS */
+.results{display:none;text-align:center;padding:26px 20px 32px}
+.results.show{display:block;animation:cIn .4s ease}
+.res-icon{font-size:4rem;margin-bottom:4px;display:block;animation:catB .7s ease .2s both}
+.res-title{font-size:1.35rem;font-weight:800;color:#fff}
+.res-by{font-size:.72rem;color:var(--gold);margin-top:2px;font-weight:600}
+.res-sub{font-size:.82rem;color:var(--dim);margin:4px 0 18px}
+.sring{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 0 6px var(--blue-pale)}
+.sinner{width:92px;height:92px;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid var(--border)}
+.sbig{font-size:1.8rem;font-weight:900;color:var(--gold);line-height:1}
+.sden{font-size:.68rem;color:var(--dim)}
+.stat-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.stat{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 18px;min-width:80px}
+.stat .v{font-size:1.3rem;font-weight:800}
+.stat .l{font-size:.66rem;color:var(--dim);margin-top:2px}
+.stat.g .v{color:var(--green)}.stat.r .v{color:var(--red)}.stat.b .v{color:var(--blue-lt)}
+.rbtn{background:var(--blue);color:#fff;border:none;border-radius:9px;padding:11px 24px;font-size:.86rem;font-weight:700;cursor:pointer;margin:4px;transition:all .18s}
+.rbtn:hover{background:var(--blue-lt);transform:translateY(-2px)}
+.rbtn.gold{background:var(--gold);color:#020a18}.rbtn.gold:hover{background:var(--gold-dk)}
+
+/* CONFETTI */
+.cfc{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden}
+.cp{position:absolute;border-radius:2px;opacity:0;animation:cfF 2.8s ease-in forwards}
+@keyframes cfF{0%{opacity:1;transform:translateY(-10px) rotate(0)}80%{opacity:1}100%{opacity:0;transform:translateY(100vh) rotate(760deg)}}
+@media(max-width:580px){.cbody{padding:13px 13px 10px}.nav{padding:9px 13px 13px}.para-box,.para-lbl,.fbbar{margin-left:13px;margin-right:13px}}
+</style>
+</head>
+<body>
+<div class="cfc" id="cfc"></div>
+
+<div class="hdr">
+  <h1>📘 Din Kültürü ve Ahlak Bilgisi</h1>
+  <div class="prep">Hazırlayan: Ayşe Yazıcı</div>
+  <div class="sub">10. Sınıf · 100 Soru · Allah'ı Tanımak &amp; İslam'da Yorumlar</div>
+  <div class="tabs">
+    <button class="tab active" id="tab1" onclick="switchSec(1)">1. Bölüm<br><small>Allah'ı Tanımak (1–50)</small></button>
+    <button class="tab" id="tab2" onclick="switchSec(2)">2. Bölüm<br><small>İslam'da Yorumlar (1–50)</small></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="prog-row">
+    <span class="qlabel" id="qlabel">Soru 1 / 50</span>
+    <div class="prog-track"><div class="prog-fill" id="pfill"></div></div>
+    <span class="spill" id="spill">✦ 0 doğru</span>
+  </div>
+
+  <div class="card" id="card">
+    <div id="plbl" class="para-lbl" style="display:none"></div>
+    <div id="pbox" class="para-box" style="display:none"></div>
+
+    <!-- CUTE CAT MASCOT -->
+    <div class="mstrip">
+      <div class="cat-box" id="catbox">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- graduation cap -->
+          <polygon points="50,4 76,16 50,28 24,16" fill="#f59e0b"/>
+          <rect x="26" y="15" width="48" height="6" rx="2" fill="#d97706"/>
+          <line x1="74" y1="18" x2="78" y2="30" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="78" cy="32" r="3.5" fill="#f59e0b"/>
+          <!-- ears -->
+          <path d="M22 54 L16 36 L36 46 Z" fill="#1e3a8a"/>
+          <path d="M78 54 L84 36 L64 46 Z" fill="#1e3a8a"/>
+          <path d="M25 52 L20 40 L34 48 Z" fill="#fda4af"/>
+          <path d="M75 52 L80 40 L66 48 Z" fill="#fda4af"/>
+          <!-- head -->
+          <circle cx="50" cy="60" r="30" fill="#1e3a8a"/>
+          <!-- face -->
+          <ellipse cx="50" cy="62" rx="22" ry="20" fill="#162d6b"/>
+          <!-- eyes white -->
+          <circle cx="40" cy="58" r="9" fill="white"/>
+          <circle cx="60" cy="58" r="9" fill="white"/>
+          <!-- pupils -->
+          <circle id="pL" cx="41" cy="58" r="5.5" fill="#040e1f"/>
+          <circle id="pR" cx="61" cy="58" r="5.5" fill="#040e1f"/>
+          <!-- highlights -->
+          <circle cx="42" cy="56" r="2" fill="white"/>
+          <circle cx="62" cy="56" r="2" fill="white"/>
+          <!-- nose -->
+          <polygon points="50,66 47,70 53,70" fill="#fda4af"/>
+          <!-- mouth normal -->
+          <g id="mouthG">
+            <path d="M44 73 Q50 77 56 73" stroke="#e2e8f0" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </g>
+          <!-- whiskers -->
+          <line x1="18" y1="67" x2="43" y2="68" stroke="#94a3b8" stroke-width="1" stroke-linecap="round"/>
+          <line x1="18" y1="72" x2="43" y2="71" stroke="#94a3b8" stroke-width="1" stroke-linecap="round"/>
+          <line x1="57" y1="68" x2="82" y2="67" stroke="#94a3b8" stroke-width="1" stroke-linecap="round"/>
+          <line x1="57" y1="71" x2="82" y2="72" stroke="#94a3b8" stroke-width="1" stroke-linecap="round"/>
+          <!-- sparkles (happy) -->
+          <g id="sparks" opacity="0">
+            <text x="14" y="52" font-size="10" fill="#f59e0b">✦</text>
+            <text x="76" y="52" font-size="10" fill="#f59e0b">✦</text>
+          </g>
+          <!-- tear (sad) -->
+          <ellipse id="tear" cx="36" cy="68" rx="2" ry="3" fill="#60a5fa" opacity="0"/>
+          <!-- body -->
+          <ellipse cx="50" cy="94" rx="22" ry="14" fill="#1e3a8a"/>
+          <ellipse cx="38" cy="96" rx="8" ry="5" fill="#162d6b"/>
+          <ellipse cx="62" cy="96" rx="8" ry="5" fill="#162d6b"/>
+        </svg>
+      </div>
+      <div class="mmsg">
+        <div class="hi" id="mhi">Soruyu dikkatlice oku...</div>
+        <div class="lo" id="mlo">En uygun şıkkı seç</div>
+      </div>
+    </div>
+
+    <div class="cbody" id="cbody"></div>
+    <div class="fbbar" id="fbbar"></div>
+    <div class="nav">
+      <button class="nb prev" id="bprev" onclick="prevQ()" disabled>◀ Önceki</button>
+      <div class="dots" id="dots"></div>
+      <button class="nb next" id="bnext" onclick="nextQ()" disabled>Sonraki ▶</button>
+    </div>
+  </div>
+
+  <div class="results" id="results"></div>
+</div>
+
+<script>
+const K=['A','B','C','D','E'];
+
+/* ===== BÖLÜM 1 — 50 SORU ===== */
+const q1=[
+{s:1,q:"'Din' kavramının en kapsamlı tanımı aşağıdakilerden hangisidir?",opts:["Sadece ibadet kurallarından oluşan normlar bütünü","İnsanın Allah ile bireysel ilişkisini düzenleyen özel kurallar","İnsanı hem bireysel hem toplumsal hayatta yönlendiren, Allah'tan geldiğine inanılan ilkeler bütünü","Devlet yönetimine ilişkin siyasi kurallar toplamı","Yalnızca ahlaki öğütlerden oluşan felsefi bir sistem"],ans:2},
+{s:2,q:"Dinin yorumu (te'vil/tefsir) kavramı ne anlama gelir?",opts:["Dini metinlerin değiştirilerek yeniden yazılması","Kutsal metinlerin ve dini hükümlerin anlaşılıp açıklanması süreci","Yalnızca âlimlerin okuyabileceği gizli bilgiler","Dini hükümlerin tamamen akılla belirlenmesi","Hz. Peygamber'in sözlerinin ezberden aktarılması"],ans:1},
+{s:3,q:"Kozmolojik delilin dayandığı temel ilke aşağıdakilerden hangisidir?",opts:["Evrende mükemmel bir tasarım ve düzen vardır","İnsan zihninde en yüce varlık kavramı bulunur","Her sonucun bir nedeni, her nedenlinin de bir başlangıcı vardır","Dini deneyim evrensel bir gerçeği yansıtır","İnanç deneyimi bireyin psikolojisiyle açıklanamaz"],ans:2},
+{s:4,q:"Teleolojik delilde 'tasarım' argümanı neyi kanıtlamaya çalışır?",opts:["Evrenin bir başlangıcının olduğunu","Allah'ın sonsuz ve zorunlu bir Varlık olduğunu","Evrende gözlemlenen düzen ve amacın bilinçli bir Yaratıcı'ya işaret ettiğini","İnsanın doğuştan Allah'a yönelik bir eğilimle doğduğunu","Dini deneyimlerin gerçek bir kaynaktan beslendiğini"],ans:2},
+{s:5,q:"Ontolojik delilin diğer delillerden temel farkı nedir?",opts:["Evrendeki fiziksel olgulara dayanması","Dini metinlere atıfta bulunması","Gözlem ve deneye dayalı olması","Tamamen saf akıl yürütmeye dayanması, gözlem gerektirmemesi","Toplumsal deneyimleri temel alması"],ans:3},
+{s:6,q:"Dinî tecrübe delilinin temelini oluşturan İslami kavram hangisidir?",opts:["Takva","Fıtrat","İcma","Kıyas","İçtihat"],ans:1},
+{s:7,q:"'Kendisinden daha mükemmeli düşünülemeyen Varlık'ın gerçekte de var olması gerekir' argümanı hangi delile aittir?",opts:["Kozmolojik Delil","Teleolojik Delil","Ontolojik Delil","Dinî Tecrübe Delili","Ahlak Delili"],ans:2},
+{s:8,q:"'Saatin varlığı saatçiyi kanıtlar' benzetmesi hangi delili açıklamak için kullanılır?",opts:["Kozmolojik Delil","Ontolojik Delil","Dinî Tecrübe Delili","Teleolojik Delil","Ahlak Delili"],ans:3},
+{s:9,q:"Kozmolojik delile yöneltilen en yaygın eleştiri hangisidir?",opts:["Delil çok soyut ve anlaşılmazdır","'İlk Neden neden Allah olsun?' sorusuna kesin cevap verememesi","Evrim teorisiyle doğrudan çelişmesi","Öznel deneyimlere dayanması","Yalnızca Müslümanlara özgü olması"],ans:1},
+{s:10,q:"Allah'ın varlığına dair delillerin genel özelliği aşağıdakilerden hangisidir?",opts:["Birbirini çürütür, tek doğru delil seçilmelidir","Yalnızca Müslüman düşünürlere aittir","Her biri farklı bir açıdan yaklaşır, birbirini destekler","Bilimsel deneyle kesin olarak ispatlanmıştır","Yalnızca felsefeciler tarafından kabul görür"],ans:2},
+{s:11,q:"Dini tecrübe delilinin zayıf yönü olarak gösterilen husus nedir?",opts:["Evrendeki düzeni açıklayamaması","Soyut olması ve pratikte işe yaramaması","Öznel olması, bilimsel ölçüme kapalı bulunması","Evrim teorisiyle çelişmesi","Tarihsel kanıtlara dayanmaması"],ans:2},
+{s:12,q:"'Din' kelimesinin Arapçada taşıdığı anlamlar arasında hangisi yer almaz?",opts:["Hüküm, yargı","İtaat, teslimiyet","Hesap, ceza","Kehanet, falcılık","Örf, gelenek"],ans:3},
+{s:13,q:"İslam'a göre dinin temel amacı nedir?",opts:["Yalnızca ahiret kurtuluşunu güvence altına almak","Devlet otoritesini pekiştirmek","İnsanı dünya ve ahirette mutluluğa ulaştırmak","Aklı devre dışı bırakarak körü körüne itaati sağlamak","Sadece ahlaki erdemleri öğretmek"],ans:2},
+{s:14,q:"Aşağıdakilerden hangisi ilahi (vahye dayalı) dinlerin ortak özelliği değildir?",opts:["Tevhid (Allah'ın birliği) inancı","Peygamberlik kurumu","Ahiret inancı","Çok tanrılı ibadet sistemi","Ahlaki sorumluluk"],ans:3},
+{s:15,q:"Kelam ilminin temel işlevi nedir?",opts:["İslam hukukunun pratik hükümlerini belirlemek","İslam'ın inanç esaslarını akli yöntemlerle temellendirmek ve savunmak","Kur'an ayetlerini dil açısından incelemek","Hz. Peygamber'in hadislerini sınıflandırmak","Tasavvuf yolunu öğretmek"],ans:1},
+{s:16,q:"Teleolojik delile yöneltilen en önemli itiraz hangisidir?",opts:["Zihinden gerçeğe geçişin mantıksal olmaması","Evrim teorisinin bu argümana alternatif açıklama sunması","Tarihsel kanıt bulunmaması","Deney ve gözleme dayanmaması","Ontolojik argümanla çelişmesi"],ans:1},
+{s:17,q:"Kozmolojik delilde 'zorunlu varlık' kavramı neyi ifade eder?",opts:["Fizik yasalarına tabi olan ilk madde","Var olması için başka bir sebebe ihtiyaç duymayan, varlığı zorunlu olan Varlık","Evrenin kendi kendine var olabileceği fikri","İnsanın Allah'ı tanıma yeteneği","Doğadaki neden-sonuç zinciri"],ans:1},
+{s:18,q:"Aşağıdaki bilim dallarından hangisi Allah'ın varlığına dair argümanlarla en doğrudan ilişkilidir?",opts:["Biyoloji","Kelam (İslam Teolojisi)","Fıkıh","Hadis","Siyer"],ans:1},
+{s:19,q:"Hangi delil, yalnızca 'zihinsel kavramlar' üzerinden Allah'ın varlığını ispat etmeye çalışır?",opts:["Kozmolojik Delil","Teleolojik Delil","Dinî Tecrübe Delili","Ahlak Delili","Ontolojik Delil"],ans:4},
+{s:20,q:"Fıtrat kavramı dinî tecrübe deliliyle nasıl ilişkilidir?",opts:["Fıtrat, insanın Allah'ı reddetme eğilimini ifade eder","Fıtrat, insanın doğuştan taşıdığı Allah'a yönelme eğilimini ifade eder; bu da dinî tecrübenin evrenselliğini açıklar","Fıtrat yalnızca ahlaki erdemleri kapsar","Fıtrat kavramı Kur'an'da geçmez","Fıtrat, sosyal öğrenmeyle kazanılan bir eğilimdir"],ans:1},
+{s:21,q:"Allah'ın varlığına ilişkin deliller arasında en eski ve en yaygın kabul göreni hangisidir?",opts:["Ontolojik Delil","Dinî Tecrübe Delili","Kozmolojik Delil","Ahlak Delili","Epistemolojik Delil"],ans:2},
+{s:22,q:"'Sonsuz geri gidiş imkânsızdır' önermesi hangi delilde kritik rol oynar?",opts:["Teleolojik Delil","Ontolojik Delil","Kozmolojik Delil","Dinî Tecrübe Delili","Tasarım Delili"],ans:2},
+{s:23,q:"Aşağıdakilerden hangisi İslam'da dinin kaynakları arasında yer alır?",opts:["Yalnızca Kur'an","Kur'an ve Sünnet","Kur'an, Sünnet, İcma ve Kıyas","Yalnızca akıl","Kur'an ve felsefe"],ans:2},
+{s:24,q:"Dinî tecrübe delilinin güçlü yanı nedir?",opts:["Yalnızca tek bir kültürde gözlemlenmesi","Evrensel ve tutarlı biçimde farklı kültür ve dönemlerde yaşanmış olması","Bilimsel ölçüme tam anlamıyla açık olması","Soyut akıl yürütmeden tamamen bağımsız olması","Kesin matematiksel kanıtlara dayanması"],ans:1},
+{s:25,q:"Aşağıdaki eşleştirmelerden hangisi doğrudur?",opts:["Kozmolojik Delil → Evrende Tasarım","Teleolojik Delil → İlk Neden","Ontolojik Delil → Zihinsel Kavram / Zorunlu Varlık","Dinî Tecrübe Delili → Nedensellik İlkesi","Kozmolojik Delil → Mükemmel Varlık Fikri"],ans:2},
+
+/* Ayet Delil */
+{s:26,tag:"Ayet Delil",ayet:'"Şüphesiz göklerin ve yerin yaratılmasında, gece ile gündüzün birbiri ardınca gelmesinde, insanlara yarar sağlayacak şeylerle denizde seyreden gemilerde, Allah\'ın gökten su indirip onunla yeri diriltmesinde… elbette düşünen bir topluluk için deliller vardır."',ayetRef:"Bakara, 2/164",q:"Bu ayet, Allah'ın varlığına dair hangi delil türüyle en doğrudan örtüşür?",opts:["Ontolojik Delil","Ahlak Delili","Kozmolojik / Teleolojik Delil","Dinî Tecrübe Delili","Tarihsel Delil"],ans:2},
+{s:27,tag:"Ayet Delil",ayet:'"Biz onlara hem dış dünyada (âfâkta) hem de kendi içlerinde (enfüste) ayetlerimizi göstereceğiz."',ayetRef:"Fussilet, 41/53",q:"Bu ayette geçen 'âfâk' ve 'enfüs' kavramları sırasıyla neyi ifade eder?",opts:["Cennet ve cehennem","Geçmiş ve gelecek","Dış dünya/evren ve insanın iç dünyası","Melek ve şeytan","Dünya ve ahiret"],ans:2},
+{s:28,tag:"Ayet Delil",ayet:'"Yoksa onlar hiçten mi yaratıldılar? Yoksa kendileri mi yaratıcı?"',ayetRef:"Tûr, 52/35",q:"Bu retorik soru, hangi delil türünü Kur'an diliyle ifade eder?",opts:["Teleolojik Delil","Kozmolojik Delil","Ontolojik Delil","Ahlak Delili","Dini Tecrübe Delili"],ans:1},
+{s:29,tag:"Ayet Delil",ayet:'"Sen yüzünü hanif olarak dine, Allah\'ın insanları üzerinde yarattığı fıtrata yönelt."',ayetRef:"Rûm, 30/30",q:"Bu ayet, Allah'ın varlığına dair delillerden hangisiyle en doğrudan ilişkilidir?",opts:["Kozmolojik Delil","Teleolojik Delil","Ontolojik Delil","Ahlak Delili","Dinî Tecrübe Delili — fıtrat"],ans:4},
+{s:30,tag:"Ayet Delil",q:"Kur'an-ı Kerim'in Allah'ın varlığını gösterirken başvurduğu delil türleriyle en az örtüşen hangisidir?",opts:["Göklerin ve yerin yaratılışındaki düzene dikkat çekmek","Her varlığın bir sebebi olması gerektiğini hatırlatmak","İnsan fıtratındaki ilahi yönelimi kanıt göstermek","Yalnızca soyut mantıksal kavramlar üzerinden 'zorunlu varlık' argümanı kurmak","Canlılardaki biyolojik düzeni işaret etmek"],ans:3},
+
+/* Sıfatlar */
+{s:31,tag:"Allah'ın Sıfatları",q:"İslam kelam ilminde 'selbî' ve 'sübûtî' sıfatlar arasındaki temel fark hangisiyle doğru ifade edilir?",opts:["Selbî sıfatlar Kur'an'da, sübûtî sıfatlar hadislerde geçer","Selbî sıfatlar Allah'ta bulunan nitelikleri kapsar","Sübûtî sıfatlar Allah'ta kesin olarak var olan nitelikleri; selbî sıfatlar Allah'ın yaratılmışlara benzemediğini ifade eder","İkisi özünde aynı anlama gelir","Sübûtî sıfatlar akılla kavranabilir; selbî sıfatlar idrak dışındadır"],ans:2},
+{s:32,tag:"Allah'ın Sıfatları",q:"'Vücud' sıfatı ne anlama gelir?",opts:["Allah'ın tek olması","Allah'ın var olması","Allah'ın ezelî olması","Allah'ın her şeyi bilmesi","Allah'ın her şeyi işitmesi"],ans:1},
+{s:33,tag:"Allah'ın Sıfatları",q:"'Kıdem' sıfatı ne anlama gelir?",opts:["Allah'ın sonsuzluğu, sonunun olmaması","Allah'ın her şeyi görmesi","Allah'ın ezelî olması, başlangıcının bulunmaması","Allah'ın her şeye gücü yetmesi","Allah'ın yaratılmışlara benzememesi"],ans:2},
+{s:34,tag:"Allah'ın Sıfatları",q:"'Beka' sıfatı ne anlama gelir?",opts:["Allah'ın var olması","Allah'ın ezelîliği","Allah'ın ebedî olması, sonunun bulunmaması","Allah'ın birliği","Allah'ın her şeyi bilmesi"],ans:2},
+{s:35,tag:"Allah'ın Sıfatları",q:"'Vahdaniyet' sıfatı ne anlama gelir?",opts:["Allah'ın varlığı için başkasına ihtiyaç duymaması","Allah'ın sonradan olanlara benzememesi","Allah'ın her şeyi işitmesi","Allah'ın zat, sıfat ve fiillerinde tek ve eşsiz olması","Allah'ın başlangıcının olmaması"],ans:3},
+{s:36,tag:"Allah'ın Sıfatları",q:"'Muhalefetin lil-havadis' sıfatı neyi ifade eder?",opts:["Allah'ın varlığının başkasına muhtaç olmaması","Allah'ın zatında ve sıfatında tek olması","Allah'ın yarattığı hiçbir varlığa benzememesi; sonradan var olan her şeyden farklı olması","Allah'ın ezelî olması","Allah'ın sonsuz ilim sahibi olması"],ans:2},
+{s:37,tag:"Allah'ın Sıfatları",q:"'Kıyam bi-nefsih' sıfatının doğru tanımı hangisidir?",opts:["Allah'ın tüm canlıları hayatta tutması","Allah'ın varlığının başlangıçsız ve zorunlu olması","Allah'ın yarattıklarına benzememesi","Allah'ın ebediyen var olmaya devam etmesi","Allah'ın varlığı için başka bir varlığa, mekâna ya da sebebe ihtiyaç duymaması"],ans:4},
+{s:38,tag:"Allah'ın Sıfatları",q:"Aşağıdakilerden hangisi selbî (zati) sıfatlar arasında yer almaz?",opts:["Vücud","Kıdem","Beka","Hayat","Vahdaniyet"],ans:3},
+{s:39,tag:"Allah'ın Sıfatları",q:"Aşağıdaki sıfat–tanım eşleştirmelerinden hangisi yanlıştır?",opts:["Vücud → Allah'ın var olması","Kıdem → Allah'ın ezelî olması","Beka → Allah'ın ebedî olması","Vahdaniyet → Allah'ın tek ve eşsiz olması","Kudret → Allah'ın son derece merhametli olması"],ans:4},
+{s:40,tag:"Allah'ın Sıfatları",q:"Aşağıdakilerden hangisi sübûtî sıfatlar arasında değil, selbî sıfatlar arasında yer alır?",opts:["Hayat","İlim","Kıdem","Kudret","İrade"],ans:2},
+{s:41,tag:"Allah'ın Sıfatları",q:"'Hayat' sıfatı ne anlama gelir?",opts:["Allah'ın her şeyi bilmesi","Allah'ın her şeyi işitmesi","Allah'ın diri, her şeyi yaratan ve devam ettiren olması","Allah'ın her şeye gücü yetmesi","Allah'ın dilemesi"],ans:2},
+{s:42,tag:"Allah'ın Sıfatları",q:"'İlim' sıfatı ne anlama gelir?",opts:["Allah'ın sonsuz gücü","Allah'ın gizli ve açık her şeyi bilmesi","Allah'ın her şeyi işitmesi","Allah'ın her şeyi görmesi","Allah'ın konuşması"],ans:1},
+{s:43,tag:"Allah'ın Sıfatları",q:"Allah'ın 'Semi'' ve 'Basar' sıfatları sırasıyla ne anlama gelir?",opts:["Sonsuz güç ve sonsuz irade","Yaratmak ve rızık vermek","İşitmek ve görmek","Konuşmak ve bildirmek","Bilmek ve hayat vermek"],ans:2},
+{s:44,tag:"Allah'ın Sıfatları",q:"'İrade' sıfatı neyi ifade eder?",opts:["Allah'ın her şeyi görmesi","Allah'ın her şeyi işitmesi","Allah'ın her şeyi bilmesi","Allah'ın dilemesi, seçmesi","Allah'ın her şeye gücü yetmesi"],ans:3},
+{s:45,tag:"Allah'ın Sıfatları",q:"'Tekvin' sıfatına ilişkin Maturidi ile Eş'ari arasındaki görüş ayrılığı hangisidir?",opts:["Maturidiler Tekvin'i inkâr eder; Eş'ariler kabul eder","Maturidiler Tekvin'i bağımsız bir sübûtî sıfat kabul eder; Eş'ariler ise Kudret ve İrade içinde değerlendirir","Her ikisi de Tekvin'i selbî sıfat sayar","Eş'ariler bağımsız kabul eder; Maturidiler etmez","İki ekol arasında hiçbir görüş ayrılığı yoktur"],ans:1},
+{s:46,tag:"Allah'ın Sıfatları",q:"'Kelam' sıfatı ne anlama gelir?",opts:["Allah'ın her şeyi bilmesi","Allah'ın dilemesi","Allah'ın konuşması, peygamberlere vahiy göndermesi","Allah'ın her şeyi görmesi","Allah'ın ezelî olması"],ans:2},
+{s:47,tag:"Allah'ın Sıfatları",q:"'Kudret' sıfatı ne anlama gelir?",opts:["Allah'ın her şeyi bilmesi","Allah'ın her şeyi işitmesi","Allah'ın konuşması","Allah'ın her şeye gücü yetmesi","Allah'ın dilemesi"],ans:3},
+{s:48,tag:"Allah'ın Sıfatları",q:"'Haberî sıfatlar' kavramı kelam ilminde neyi ifade eder?",opts:["Allah'ta kesin olarak bulunduğu ispat edilen ve akılla kavranabilen sıfatlar","Kur'an veya hadislerde Allah'a nispet edilen el (yed), yüz (vech), göz (ayn) gibi ifadeler; mahiyetleri Allah'ın ilmine bırakılır ya da mecazi yorumlanır","Peygamberlere özgü vasıfların bütünü","Allah'ın yaratıkları aracılığıyla kendini hissettirmesi","İnsanın Allah'ı zihninde tasavvur biçimini açıklayan kavramlar"],ans:1},
+{s:49,tag:"Allah'ın Sıfatları",q:"Ehlisünnet kelam anlayışında Allah'ın sıfatları kaç ana gruba ayrılır?",opts:["İkiye: selbî ve sübûtî (haberî sıfatlar da ayrıca sayılır)","Tek gruba: tüm sıfatlar eşittir","Beşe: vücudî, selbî, sübûtî, fiilî, haberî","Üçe: yalnızca selbî, sübûtî ve haberî","Yediye: rububiyet sıfatlarına göre"],ans:0},
+{s:50,tag:"Allah'ın Sıfatları",q:"Aşağıdaki eşleştirmelerden hangisi doğrudur?",opts:["Kıdem → Sübûtî sıfat","Hayat → Selbî sıfat","Vahdaniyet → Sübûtî sıfat","Kudret → Selbî sıfat","Kıyam bi-nefsih → Selbî sıfat"],ans:4}
+];
+
+/* ===== BÖLÜM 2 — 50 SORU ===== */
+const q2=[
+{s:1,q:"'Mezhep' kelimesinin Arapça kökü ve temel anlamı nedir?",opts:["Ferika – ayrılmak","Zehebe – gitmek; belirli bir âlim etrafında oluşan dini yorum okulu","Akade – bağlamak; inanç esasları","İctehede – çaba göstermek; hüküm çıkarma","Halefe – yerine geçmek; liderlik"],ans:1},
+{s:2,q:"'Fırka' kavramı İslam düşüncesinde neyi ifade eder?",opts:["Bir âlimin tüm eserlerini kapsayan külliyat","Dört büyük fıkıh mezhebinden herhangi biri","Siyasi veya itikadi bir meselede ana topluluktan ayrılan grup","Kur'an-ı Kerim'in bölümlerinden biri","Allah'ın sıfatlarından birini açıklayan terim"],ans:2},
+{s:3,q:"İslam'da 'içtihat' hangi koşulda zorunlu hale gelir?",opts:["Hz. Peygamber bir konu hakkında iki farklı hadis bıraktığında","Kur'an'ın bir ayeti silindiğinde","Hakkında açık nas bulunmayan yeni bir meseleyle karşılaşıldığında","Mevcut hükümlerin geri alınması gerektiğinde","Yalnızca savaş dönemlerinde"],ans:2},
+{s:4,q:"Ehlisünnet'in fıkhi kaynaklarının doğru sıralaması hangisidir?",opts:["Kur'an → Sünnet → Kıyas → İcma","Kur'an → Sünnet → İcma → Kıyas","Sünnet → Kur'an → İcma → Kıyas","İcma → Kıyas → Kur'an → Sünnet","Kur'an → İcma → Sünnet → Kıyas"],ans:1},
+{s:5,q:"Şia'nın temel itikadi ilkesi olan 'imamet' ne anlama gelir?",opts:["Camide namaz kıldıran imam","Hz. Peygamber'in hadislerini aktaran râvi","Hz. Ali ve soyundan gelen, masum, Allah tarafından belirlenmiş dini-siyasi liderlik","Dört büyük halife döneminin yönetim anlayışı","Müçtehit âlimlerin oluşturduğu danışma kurulu"],ans:2},
+{s:6,q:"Ehlisünnet'in iki itikadi ekolü ve coğrafi yayılımı doğru eşleştirilmiş seçenek hangisidir?",opts:["Maturidilik (Arap dünyası) – Eş'arilik (Türkler)","Maturidilik (Türkler, Orta Asya) – Eş'arilik (Arap dünyası)","Maturidilik (İran) – Eş'arilik (Hindistan)","Her iki ekol de aynı coğrafyada eş zamanlı gelişmiştir","Maturidilik (Afrika) – Eş'arilik (Orta Asya)"],ans:1},
+{s:7,q:"'İtikad' kavramı neyi ifade eder?",opts:["İslam hukukunun pratik kuralları","Kur'an'ın dil bilgisi incelemesi","Kalple kesinlikle inanılan iman esasları","Peygamberlerin hayat hikâyeleri","Tasavvufta manevi makamlar"],ans:2},
+{s:8,q:"'Fıkıh' kavramı İslam'da ne anlama gelir?",opts:["Allah'ın varlığını kanıtlayan ilim","İslam hukuku; ibadet, muamelat ve ahlaka ilişkin pratik hükümler bütünü","Peygamberlere inen vahiy metinleri","Tasavvuf geleneğindeki gizli bilgi","Kur'an'ın ezberlenmesi ilmi"],ans:1},
+{s:9,q:"Şia'da 'gaybet' ne anlama gelir?",opts:["İmamın topluma açık dini dersleri","Kerbela şehitlerinin anma töreni","12. İmam Mehdi'nin gözden uzaklaşması; dönüşüne kadar süren bekleme dönemi","Müslümanların hicret etmesi","Büyük günahı olan kişinin toplumdan dışlanması"],ans:2},
+{s:10,q:"Kerbela olayının (680) Şia kimliği açısından önemi nedir?",opts:["İlk Müslüman devletinin kurulması","Kur'an'ın yazıya geçirilmesi","Hz. Hüseyin'in şehadeti; Şia'nın ayrı bir kimlik olarak şekillenmesinde dönüm noktası","Ehlisünnet mezhepler hukukunun kodifiye edilmesi","İlk Haçlı seferine verilen cevap"],ans:2},
+{s:11,q:"'İcma' kavramının fıkıhtaki tanımı aşağıdakilerden hangisidir?",opts:["Müçtehit âlimlerin bir hukuki meselede görüş birliğine varması","Kur'an'ın dil ve anlam açıdan yorumlanması","Allah'ın tüm peygamberlere ortak mesaj göndermesi","Hükümdara itaatin zorunlu olduğu fikri","Mezhep kurucusunun kendi görüşünü onaylaması"],ans:0},
+{s:12,q:"'Kıyas' yöntemi fıkıhta nasıl işler?",opts:["Yalnızca Kur'an ayetlerini karşılaştırmak","Bir hadisin senedini değerlendirmek","Hakkında nas bulunmayan meseleyi benzer bir meselenin hükmüne göre çözme","Devlet başkanının kararlarını uygulamak","Tasavvuf şeyhinin manevi rehberliğini takip etmek"],ans:2},
+{s:13,q:"Ehlisünnet'te liderlik (hilafet) nasıl belirlenir?",opts:["Allah tarafından doğrudan atanır","Yalnızca Hz. Ali soyundan gelir","Seçim veya toplumsal uzlaşıyla; Kureyş kabilesinden olma şartı aranır","Askeri güce göre belirlenir","İlk doğan erkek çocuğa miras yoluyla geçer"],ans:2},
+{s:14,q:"Şia'da imamın 'masum' olması ne anlama gelir?",opts:["İmamın yargılanamaz olması","İmamın günah işlemekten Allah tarafından korunmuş olması (ismet)","İmamın savaşlarda hayatta kalması","İmamın yalnızca dini konularda söz sahibi olması","İmamın Kur'an ezberini eksiksiz bilmesi"],ans:1},
+{s:15,q:"Dini yorumların farklılaşmasının temel sebepleri arasında hangisi yer almaz?",opts:["Hz. Peygamber sonrası liderlik tartışması","Akıl – nakil dengesinin farklı kurulması","Kur'an'ın farklı coğrafyalarda okunmaması","Yeni kültürlerle karşılaşma","Siyasi çatışmalar (Cemel, Sıffin, Kerbela)"],ans:2},
+{s:16,q:"'Hilafet' kavramı İslam düşüncesinde ne anlama gelir?",opts:["Şia'daki masum imam inancı","Hz. Peygamber'den sonra İslam devletinin başkanlığı","Fıkıhta analoji yöntemi","Allah'ın isimlerinden biri","Kur'an'ın bölümlerini ifade eden terim"],ans:1},
+{s:17,q:"Büyük günah işleyen kişi hakkında Ehlisünnet'in tutumu nedir?",opts:["Kişi dinden çıkar ve kâfir olur","Kişi günahkârdır fakat Müslüman olarak kalır","Kişi derhal toplumdan dışlanmalıdır","Kişi tövbe etmek zorunda değildir","Kişinin imanı otomatik olarak yenilenir"],ans:1},
+{s:18,q:"Ehlisünnet'in dört fıkıh mezhebi hangisidir?",opts:["Hanefi, İmamiyye, Zeydiyye, Şafii","Hanefi, Maliki, Şafii, Hanbeli","Maturidi, Eş'ari, Hanefi, Maliki","İmamiyye, İsmailiyye, Zeydiyye, Hanbeli","Hanefi, Şafii, Caferiyye, Maliki"],ans:1},
+{s:19,q:"'İçtihat' kavramının tanımı hangisidir?",opts:["Kur'an'ı yüksek sesle okumak","Âlimin dini bir meselede Kur'an ve Sünnet'ten hüküm çıkarmak için gösterdiği azami çaba","Cami cemaatinin ortak kararı","Devlet başkanının dini konulardaki emri","Tasavvufta zikirle Allah'a yaklaşma yöntemi"],ans:1},
+{s:20,q:"Şia'nın en yaygın kolu olan İmamiyye'nin diğer adı nedir?",opts:["Zeydiyye","İsmailiyye","12 İmam Şiası","Mutezile","Haricilik"],ans:2},
+{s:21,q:"'Nas' kavramı fıkıhta ne anlama gelir?",opts:["Âlimlerin ortak görüşü","Kur'an veya Sünnet'ten gelen açık, yoruma kapalı hüküm","Toplumun örf ve adetleri","Yöneticinin çıkardığı kanun","Mantıksal çıkarım yoluyla ulaşılan sonuç"],ans:1},
+{s:22,q:"Gadir Hum olayını Şia nasıl yorumlar?",opts:["Hz. Peygamber'in Medine'ye hicretinin simgesi","İlk Kur'an vahyinin indiği yer","Hz. Peygamber'in Hz. Ali'yi açıkça halife (imam) olarak tayin ettiği hadise","Mekke'nin fethinin kutlandığı tören","Dört halifeye biat edilen ilk toplantı"],ans:2},
+{s:23,q:"Kur'an'ın dini birliğe ilişkin mesajı (Âl-i İmrân 103) aşağıdakilerden hangisini emreder?",opts:["Farklı mezheplerin ortadan kaldırılması","'Allah'ın ipine hepiniz sımsıkı sarılın, ayrılığa düşmeyin'","Devlet tarafından tek bir mezhebin benimsenmesi","Yalnızca Arap Müslümanlara itaat edilmesi","Siyasi liderliğin din âlimlerine bırakılması"],ans:1},
+{s:24,q:"Dini yorum farklılıklarına İslami perspektiften bakıldığında aşağıdakilerden hangisi doğrudur?",opts:["Her yorum eşit derecede doğrudur, seçim tamamen bireyseldir","Farklılıklar dini zayıflatır ve tamamen önlenmelidir","Temel inanç esaslarında birlik esastır; tali meselelerdeki farklılıklar diyalog ve saygıyla ele alınmalıdır","Siyasi güç hangi yorumu belirlerse o doğrudur","Yalnızca Ehlisünnet yorumu geçerlidir, diğerleri sapkındır"],ans:2},
+{s:25,q:"Aşağıdaki eşleştirmelerden hangisi yanlıştır?",opts:["Mezhep → Sistemli dini yorum okulu","Fırka → Ana topluluktan ayrılan grup","İmamet → Şia'nın temel itikadi ilkesi","Kelam → İslam'ın pratik hukuk ilmi","Fıkıh → İslam hukukunun pratik hükümleri"],ans:3},
+
+/* Paragraf soruları */
+{s:26,tag:"Paragraf — Mezheplerin Ortaya Çıkışı",paraId:1,q:"Metne göre mezheplerin oluşmasında etkili olan faktörler arasında hangisi yer almaz?",opts:["Hz. Peygamber'in vefatından sonra yaşanan liderlik tartışmaları","Siyasi-askeri çatışmalar (Cemel, Sıffin, Kerbela)","İslam'ın farklı kültürlerle teması sonucu ortaya çıkan entelektüel sorular","Kur'an-ı Kerim'in bir bölümünün kaybolmasından kaynaklanan belirsizlikler","Dini nassların yorumlanmasında akıl ile nakil arasındaki denge meselesi"],ans:3},
+{s:27,tag:"Paragraf — Mezheplerin Ortaya Çıkışı",paraId:1,q:"Metne göre 'Kerbela (680)' olayı nasıl nitelendirilmektedir?",opts:["İslam'ın başka kültürlerle ilk temas noktası","Akıl-nakil tartışmasının fitilini yakan dönüşüm","İslam ümmetindeki ayrışmayı derinleştiren siyasi-askeri çatışma","Fıkıh mezheplerinin resmî olarak kurulduğu dönem","Hz. Peygamber'in hadislerinin yazıya geçirildiği süreç"],ans:2},
+{s:28,tag:"Paragraf — Mezheplerin Ortaya Çıkışı",paraId:1,q:"Bu metinden çıkarılabilecek en doğru genel yargı hangisidir?",opts:["Mezhep ayrılıkları yalnızca siyasi çatışmaların ürünüdür","Mezheplerin doğuşu tek bir faktöre değil, tarihî, sosyal ve entelektüel etkenlerin birleşimine bağlıdır","İslam'da mezhep oluşumu Hz. Peygamber döneminde tamamlanmıştır","Yunan felsefesiyle etkileşim İslam'ı özünden değiştirmiştir","Fıkıh mezhepleri itikadi ayrılıklardan bağımsız doğmuştur"],ans:1},
+{s:29,tag:"Paragraf — Fıkıh Mezheplerinin Oluşumu",paraId:2,q:"Metne göre Irak ekolü ile Medine ekolü arasındaki temel metodolojik fark nedir?",opts:["Irak ekolü sünnete, Medine ekolü yalnızca Kur'an'a ağırlık verir","Irak ekolü akla daha fazla alan tanırken Medine ekolü rivayet ve yerleşik uygulamayı ön plana çıkarır","Irak ekolü yalnızca hadisleri; Medine ekolü yalnızca Kur'an'ı kaynak kabul eder","Medine ekolü kıyası, Irak ekolü icmayı öncelikli sayar","İki ekol arasında metodolojik hiçbir ayrım yoktur"],ans:1},
+{s:30,tag:"Paragraf — Fıkıh Mezheplerinin Oluşumu",paraId:2,q:"Metne göre dört büyük Ehlisünnet fıkıh mezhebinin paylaştığı ortak özellik nedir?",opts:["Aynı coğrafyada ve aynı dönemde oluşmuş olmaları","Kur'an, sünnet, icma ve kıyası temel hukuk kaynakları olarak benimsemeleri","Yalnızca Kur'an'ı kaynak olarak kullanmaları","Birbirlerinin hükümlerini tamamen benimsemiş olmaları","Hepsinin aynı kurucu imama dayanması"],ans:1},
+{s:31,tag:"Paragraf — Fıkıh Mezheplerinin Oluşumu",paraId:2,q:"Metne göre fıkıh mezheplerinin güçlendiği dönem hangisine karşılık gelir?",opts:["Hz. Peygamber dönemi (m. 610–632)","Dört Halife dönemi (m. 632–661)","Emeviler'in ilk yılları (m. 661–680)","Miladi 8–10. yüzyıl (h. 2–4. yüzyıl)","Osmanlı klasik dönemi (m. 14–17. yüzyıl)"],ans:3},
+
+/* Tanım soruları */
+{s:32,tag:"Tanım — Bilgi",q:"'Mezhep' kavramı İslam düşüncesinde neyi ifade eder?",opts:["Yalnızca fıkıh alanındaki hukuki görüşler toplamı","Belirli bir âlim veya düşünce geleneği etrafında şekillenen; inanç ya da hukuk alanında sistematik dini yorum okulu","Siyasi bir lider etrafında toplanan silahlı topluluk","Hz. Peygamber'in tüm sözlerini kapsayan hadis külliyatı","Kur'an yorumuna yönelik dilbilgisi kuralları bütünü"],ans:1},
+{s:33,tag:"Tanım — Bilgi",q:"'İtikad' kavramı İslam'da neyi ifade eder?",opts:["İslam hukukunun pratik kuralları","Kur'an ayetlerinin dilbilgisi açısından incelenmesi","Kalple kesinlikle bağlanılan ve dinin temelini oluşturan iman esasları","Peygamberlerin hayat hikâyelerini inceleyen siyer ilmi","Tasavvufta manevi yükselme makamları"],ans:2},
+{s:34,tag:"Tanım — Bilgi",q:"Aşağıdakilerden hangisi İslam'da itikadi ve fıkhi mezheplerin ortaya çıkmasında doğrudan etkili olan sebeplerden biri değildir?",opts:["Hz. Peygamber'in vefatından sonra yaşanan halifelik tartışmaları","İslam'ın farklı coğrafyalara yayılmasıyla yeni kültür ve düşüncelerle karşılaşılması","Dini nassların yorumlanmasında akıl ile nakil arasındaki denge arayışı","Hz. Peygamber döneminde Kur'an metninin büyük bölümünün kaybolması","Siyasi çatışmaların (Cemel, Sıffin, Kerbela) toplumsal ayrışmayı derinleştirmesi"],ans:3},
+{s:35,tag:"Mezhepler — Bilgi",q:"İslam mezhepleri 'fıkhi (ameli) mezhepler' ve 'itikadi (kelami) mezhepler' olarak ayrılmaktadır. Aşağıdaki eşleştirmelerden hangisi doğrudur?",opts:["Hanefilik (itikadi) — Maturidilik (fıkhi)","Şafiilik (itikadi) — Eş'arilik (fıkhi)","Hanefilik (fıkhi) — Maturidilik (itikadi)","Maturidilik (fıkhi) — Eş'arilik (itikadi)","Hanbelilik (itikadi) — Malikilik (fıkhi)"],ans:2},
+{s:36,tag:"Siyasi-İtikadi Mezhepler",q:"Aşağıdaki özelliklerden hangisi Ehlisünnet'in değil, Şia'nın siyasi-itikadi anlayışını yansıtır?",opts:["Liderlik seçim veya toplumsal uzlaşıyla belirlenir; lider Kureyş'ten olmalıdır","Kur'an, sünnet, icma ve kıyas dini kaynakların tamamını oluşturur","Lider (imam) Hz. Ali soyundan gelmeli; Allah tarafından tayin edilmeli ve masum olmalıdır","Büyük günah işleyen kişi günahkâr Müslüman olarak kalır, dinden çıkmaz","İtikadi ekol olarak Maturidilik ve Eş'arilik temel görüşleri temsil eder"],ans:2},
+{s:37,tag:"Siyasi-İtikadi / Ameli-Fıkhi",q:"Aşağıdakilerden hangisi ameli-fıkhi değil, siyasi-itikadi bir mezheptir?",opts:["Hanefilik","Malikilik","Şafiilik","Hanbelilik","Şia (İmamiyye)"],ans:4},
+{s:38,tag:"Siyasi-İtikadi / Ameli-Fıkhi",q:"Aşağıdakilerden hangisi siyasi-itikadi değil, ameli-fıkhi bir mezheptir?",opts:["Ehlisünnet (itikadi çizgisi)","Şia (İmamiyye)","Zeydiyye","Malikilik","İsmailiyye"],ans:3},
+{s:39,tag:"Siyasi-İtikadi / Ameli-Fıkhi",q:"Ameli-fıkhi mezhepler hangi temel konularla ilgilenir?",opts:["Allah'ın varlığını akıl ve nakilden hareketle temellendirmek","Hz. Peygamber'den sonra İslam'ın siyasi liderliğiyle","Namaz, oruç, zekât, nikâh, ticaret gibi pratik dini hükümlerle","İmanın mahiyeti ve iman-küfür sınırının belirlenmesiyle","Vahyin indirilme biçimleri ve peygamberliğin ispatıyla"],ans:2},
+{s:40,tag:"Siyasi-İtikadi / Ameli-Fıkhi",q:"Siyasi-itikadi mezhepler hangi temel mesele etrafında şekillenmiştir?",opts:["İbadetlerin hangi mevsimde yerine getirileceği","Kur'an'ın kaç sureden oluştuğu","Hz. Peygamber'den sonra İslam topluluğunun liderliğinin kime ait olacağı ve bu liderliğin nitelikleri","Zekâtın hesaplanma ve dağıtılma yöntemi","Fıkhın dört kaynağının hangi sıraya göre kullanılacağı"],ans:2},
+{s:41,tag:"Siyasi-İtikadi / Ameli-Fıkhi",q:"İslam mezhepleri ele alındığında aşağıdaki sınıflandırmalardan hangisi doğrudur?",opts:["Hanefilik ve Şafiilik siyasi-itikadi; Şia ameli-fıkhi","Maturidilik ve Eş'arilik ameli-fıkhi; Şia siyasi-itikadi","Hanefilik, Malikilik, Şafiilik ve Hanbelilik ameli-fıkhi; Ehlisünnet ve Şia siyasi-itikadi ayrışmayı temsil eder","Zeydiyye ve İsmailiyye ameli-fıkhi; Hanefilik siyasi-itikadi","Maturidilik ameli-fıkhi; Hanbelilik siyasi-itikadi"],ans:2},
+{s:42,tag:"Siyasi-İtikadi / Ameli-Fıkhi",q:"Aşağıdaki mezhep–tür eşleştirmelerinden hangisi yanlıştır?",opts:["Hanefilik → Ameli-fıkhi mezhep","Malikilik → Ameli-fıkhi mezhep","Şia (İmamiyye) → Siyasi-itikadi mezhep","Maturidilik → Ameli-fıkhi mezhep","Ehlisünnet → Siyasi ve itikadi alanda Sünni çizgiyi temsil eden ekol"],ans:3},
+{s:43,tag:"Mezhepler",q:"Maturidilik ile Eş'arilik arasındaki önemli bir ayrım hangisidir?",opts:["Maturidilik siyasi iktidarı ön plana çıkarırken Eş'arilik tasavvufu benimser","Maturidilik insan aklına daha geniş alan tanırken Eş'arilik nassı daha belirleyici kabul eder","Eş'arilik Türk-Orta Asya coğrafyasında; Maturidilik Arap dünyasında yaygınlaşmıştır","Her iki ekol tamamen aynı sonuçlara ulaşır","Maturidilik ve Eş'arilik Ehlisünnet dışında bağımsız anlayışlardır"],ans:1},
+{s:44,tag:"Mezhepler",q:"Hanefi Mezhebi'nin kurucusu kimdir?",opts:["Malik bin Enes","Muhammed bin İdris eş-Şafii","Numan bin Sabit (İmam Ebu Hanife)","Ahmed bin Hanbel","İmam Maturidi"],ans:2},
+{s:45,tag:"Mezhepler",q:"Maliki Mezhebi'nin öne çıkan metodolojik özelliği nedir?",opts:["Aklı ve kıyası ön plana çıkarması","Medine halkının uygulamasını (ameli ehl-i Medine) kaynak olarak değerlendirmesi","Yalnızca Kur'an ayetlerini esas alması","Hadisleri tamamen reddetmesi","Tasavvuf geleneğini merkeze alması"],ans:1},
+{s:46,tag:"Mezhepler",q:"Şafii Mezhebi'nin kurucusu ve en önemli katkısı nedir?",opts:["İmam Malik; Medine uygulamasını sistematize etti","İmam Şafii; usul-ü fıkıh (fıkıh metodolojisi) ilmini kurdu","İmam Ebu Hanife; akıl ve reyi ön plana çıkardı","İmam Ahmed bin Hanbel; rivayetçi yöntemi geliştirdi","İmam Maturidi; itikadi ekol kurdu"],ans:1},
+{s:47,tag:"Mezhepler",q:"Hanbeli Mezhebi'nin diğer mezheplerden ayırt edici özelliği nedir?",opts:["Akılcı yöntemlere ve kıyasa en fazla başvurması","Rivayete ve hadise en fazla ağırlık vermesi; kıyasın kullanımını sınırlı tutması","Tasavvuf anlayışını ön plana çıkarması","Medine uygulamasını kaynak sayması","İmamın masum olması gerektiğini savunması"],ans:1},
+{s:48,tag:"Mezhepler",q:"Zeydiyye Şia'sı diğer Şia kollarından hangi önemli özelliğiyle ayrılır?",opts:["Hz. Ali'yi imam olarak kabul etmemesi","İmamın masum olmadığını savunması ve siyasi aktif mücadeleyi benimsemesi","12 imam yerine 5 imam anlayışını benimsemesi","Kur'an'ın farklı bir versiyonunu kullanması","Dört büyük fıkıh mezhebinden birini benimsemesi"],ans:1},
+{s:49,tag:"Mezhepler",q:"Aşağıdaki mezhep–kurucu eşleştirmelerinden hangisi yanlıştır?",opts:["Hanefi Mezhebi → Numan bin Sabit (İmam Ebu Hanife)","Maliki Mezhebi → Malik bin Enes","Şafii Mezhebi → Muhammed bin İdris eş-Şafii","Hanbeli Mezhebi → Ahmed bin Hanbel","Maturidilik → İmam Eş'ari"],ans:4},
+{s:50,tag:"Genel Değerlendirme",q:"Aşağıdaki eşleştirmelerden hangisi doğrudur?",opts:["Hanefilik → Siyasi-itikadi mezhep","Maturidilik → Ameli-fıkhi mezhep","Şia → Ameli-fıkhi mezhep","Ehlisünnet → Siyasi-itikadi ve itikadi çizgide ekol","Malikilik → İtikadi (kelami) mezhep"],ans:3}
+];
+
+/* ===== PARAGRAFLAR ===== */
+const paras={
+  1:{lbl:"Aşağıdaki metni okuyunuz. Sorular 26–28 bu metne aittir.",txt:"İslam tarihinde dini yorumların çeşitlenmesi ve mezheplerin doğması tek bir sebebe bağlanamaz. Bu süreçte birden fazla etkenin rol oynadığı görülmektedir. Öncelikle Hz. Peygamber'in vefatından (632) sonra liderlik meselesi, ümmet içinde ilk ciddi ayrışmayı doğurmuştur. Cemel (656), Sıffin (657) ve Kerbela (680) gibi siyasi-askeri olaylar toplumsal yarılmaları derinleştirmiştir. Bunun yanı sıra İslam'ın Arabistan dışına yayılmasıyla birlikte Yunan felsefesi, Pers kültürü ve diğer medeniyet unsurlarıyla karşılaşılmış; bu etkileşim yeni entelektüel sorular ortaya çıkarmıştır. Dini nassların yorumlanmasında akıl ile nakil arasındaki dengenin nasıl kurulacağı da tartışma konusu olmuştur. Tüm bu etkenler bir araya gelince zamanla farklı itikadi ve fıkhi ekoller, yani mezhepler şekillenmiştir."},
+  2:{lbl:"Aşağıdaki metni okuyunuz. Sorular 29–31 bu metne aittir.",txt:"İslam hukukunun (fıkhın) sistematik hale gelmesi, büyük ölçüde hicrî 2–4. yüzyıllara (miladi 8–10. yüzyıl) denk gelen bir döneme aittir. Bu dönemde farklı bölgelerde yaşayan âlimler, Kur'an ve sünneti temel alarak hukuki soruları cevaplamaya çalışmışlardır. Irak ekolü akla daha fazla yer verirken Medine ekolü rivayete ve yerleşik uygulamaya ağırlık vermiştir. Zamanla dört büyük fıkıh mezhebi — Hanefilik, Malikilik, Şafiilik ve Hanbelilik — Ehlisünnet bünyesinde güçlenmiş ve günümüze kadar yaşamaya devam etmiştir. Bu mezheplerin her biri kendi usulünü (metodolojisini) geliştirmiş; ancak hepsi Kur'an, sünnet, icma ve kıyası temel kaynak olarak kabul etmektedir."}
+};
+
+/* ===== STATE ===== */
+let sec=1,qi=0;
+const ans={},score={1:0,2:0},done={1:false,2:false};
+const msgs={
+  normal:["Soruyu dikkatlice oku...","En uygun şıkkı seç"],
+  happy:["Harika! 🎉","Çok iyi gidiyorsun!"],
+  sad:["Üzülme, devam et!","Bir sonrakinde uygula 😊"],
+  para:["Metni okuyup soruya geç 📜","Parçaya dayalı soru"]
+};
+
+function arr(){return sec===1?q1:q2;}
+
+function switchSec(s){
+  sec=s;qi=0;
+  document.getElementById('tab1').classList.toggle('active',s===1);
+  document.getElementById('tab2').classList.toggle('active',s===2);
+  if(done[s]){document.getElementById('card').style.display='none';showResults();return;}
+  document.getElementById('card').style.display='block';
+  document.getElementById('results').classList.remove('show');
+  const d=document.getElementById('divlabel');if(d)d.remove();
+  renderQ();
+}
+
+function renderQ(){
+  const a=arr(),item=a[qi],total=a.length;
+  document.getElementById('pfill').style.width=(qi/total*100)+'%';
+  document.getElementById('qlabel').textContent=`Soru ${item.s} / ${total}`;
+  document.getElementById('spill').textContent=`✦ ${score[sec]} doğru`;
+
+  const plbl=document.getElementById('plbl'),pbox=document.getElementById('pbox');
+  if(item.paraId&&paras[item.paraId]){
+    const prev=qi>0?a[qi-1]:null;
+    const fresh=!prev||prev.paraId!==item.paraId;
+    plbl.textContent='📄 '+(fresh?paras[item.paraId].lbl:'Önceki metin geçerliliğini korumaktadır');
+    pbox.textContent=paras[item.paraId].txt;
+    plbl.style.display='block';pbox.style.display='block';
+    setCat('para');
+  }else{
+    plbl.style.display='none';pbox.style.display='none';
+    setCat('normal');
+  }
+
+  if(item.divLabel){
+    const ex=document.getElementById('divlabel');if(ex)ex.remove();
+    const d=document.createElement('div');d.id='divlabel';
+    d.style.cssText='background:#0f2040;border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;padding:6px 14px;margin:12px 20px 4px;font-size:.69rem;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:.4px';
+    d.textContent=item.divLabel;
+    document.getElementById('cbody').before(d);
+  }
+
+  let html='';
+  if(item.tag) html+=`<span class="qtag">${item.tag}</span>`;
+  if(item.ayet) html+=`<div class="ayet-box">${item.ayet}<span class="ref">${item.ayetRef}</span></div>`;
+  html+=`<div class="qtext">${item.q}</div><div class="opts">`;
+  item.opts.forEach((o,j)=>{
+    html+=`<button class="opt" id="o${j}" onclick="choose(${j})"><span class="okey">${K[j]}</span><span>${o}</span></button>`;
+  });
+  html+='</div>';
+  document.getElementById('cbody').innerHTML=html;
+
+  const fb=document.getElementById('fbbar');fb.className='fbbar';fb.innerHTML='';
+  document.getElementById('bprev').disabled=(qi===0);
+  document.getElementById('bnext').disabled=true;
+  document.getElementById('bnext').textContent=qi===a.length-1?'Sonuçları Gör ▶':'Sonraki ▶';
+  renderDots();
+  if(ans[item.s])restoreAns(item);
+  const card=document.getElementById('card');
+  card.style.animation='none';
+  requestAnimationFrame(()=>{card.style.animation='cIn .28s ease';});
+}
+
+function restoreAns(item){
+  const a=ans[item.s];
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    b.classList.add('locked');
+    if(i===item.ans)b.classList.add('correct');
+    if(i===a.chosen&&!a.ok)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('fbbar');
+  if(a.ok){fb.className='fbbar ok';fb.innerHTML='✓ Doğru!';setCat('happy');}
+  else{fb.className='fbbar bad';fb.innerHTML=`✗ Yanlış. Doğru cevap: <strong>${K[item.ans]}</strong>`;setCat('sad');}
+  document.getElementById('bnext').disabled=false;
+}
+
+function choose(j){
+  const a=arr(),item=a[qi];
+  if(ans[item.s])return;
+  const ok=(j===item.ans);
+  ans[item.s]={chosen:j,ok};
+  if(ok)score[sec]++;
+  document.getElementById('spill').textContent=`✦ ${score[sec]} doğru`;
+  document.querySelectorAll('.opt').forEach((b,i)=>{
+    b.classList.add('locked');
+    if(i===item.ans)b.classList.add('correct');
+    if(i===j&&!ok)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('fbbar');
+  const cb=document.getElementById('catbox');
+  cb.classList.remove('bounce','shake');
+  if(ok){
+    fb.className='fbbar ok';fb.innerHTML='✓ Doğru! 🎉';
+    setCat('happy');void cb.offsetWidth;cb.classList.add('bounce');
+    setTimeout(()=>cb.classList.remove('bounce'),600);
+  }else{
+    fb.className='fbbar bad';fb.innerHTML=`✗ Yanlış. Doğru cevap: <strong>${K[item.ans]}</strong>`;
+    setCat('sad');void cb.offsetWidth;cb.classList.add('shake');
+    setTimeout(()=>cb.classList.remove('shake'),550);
+  }
+  renderDots();
+  document.getElementById('bnext').disabled=false;
+}
+
+function prevQ(){if(qi>0){qi--;renderQ();}}
+function nextQ(){
+  const a=arr();
+  if(qi<a.length-1){qi++;renderQ();}
+  else{done[sec]=true;showResults();}
+}
+
+function renderDots(){
+  const a=arr();
+  document.getElementById('dots').innerHTML=a.map((item,i)=>{
+    let c='dot';
+    if(i===qi)c+=' cur';
+    else if(ans[item.s])c+=ans[item.s].ok?' ok':' bad';
+    else if(i<qi)c+=' seen';
+    return`<div class="${c}"></div>`;
+  }).join('');
+}
+
+function setCat(state){
+  const pL=document.getElementById('pL'),pR=document.getElementById('pR');
+  const mg=document.getElementById('mouthG'),sp=document.getElementById('sparks'),tr=document.getElementById('tear');
+  const[hi,lo]=msgs[state]||msgs.normal;
+  document.getElementById('mhi').textContent=hi;
+  document.getElementById('mlo').textContent=lo;
+  sp.setAttribute('opacity','0');tr.setAttribute('opacity','0');
+  if(state==='happy'){
+    pL.setAttribute('cy','55');pR.setAttribute('cy','55');
+    pL.setAttribute('cx','41');pR.setAttribute('cx','61');
+    mg.innerHTML=`<path d="M43 73 Q50 80 57 73" stroke="#10b981" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+    sp.setAttribute('opacity','1');
+  }else if(state==='sad'){
+    pL.setAttribute('cy','60');pR.setAttribute('cy','60');
+    pL.setAttribute('cx','42');pR.setAttribute('cx','60');
+    mg.innerHTML=`<path d="M43 76 Q50 71 57 76" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+    tr.setAttribute('opacity','0.8');
+  }else{
+    pL.setAttribute('cy','58');pR.setAttribute('cy','58');
+    pL.setAttribute('cx','41');pR.setAttribute('cx','61');
+    mg.innerHTML=`<path d="M44 73 Q50 77 56 73" stroke="#e2e8f0" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  }
+}
+
+function showResults(){
+  document.getElementById('card').style.display='none';
+  const a=arr(),total=a.length,cor=score[sec];
+  const pct=Math.round(cor/total*100);
+  let icon,title,sub;
+  if(pct>=85){icon='🏆';title='Mükemmel!';sub='Harika bir performans sergiledin!';}
+  else if(pct>=65){icon='🎓';title='Tebrikler!';sub='Konuya hâkimiyetin oldukça iyi!';}
+  else if(pct>=45){icon='📚';title='İyi Başlangıç!';sub='Biraz daha çalışmaya devam et!';}
+  else{icon='💪';title='Devam Et!';sub='Tekrar çalışarak başarabilirsin!';}
+  const deg=Math.round(cor/total*360);
+  const other=sec===1?2:1;
+  const res=document.getElementById('results');
+  res.innerHTML=`
+    <span class="res-icon">${icon}</span>
+    <div class="res-title">${title}</div>
+    <div class="res-by">Hazırlayan: Ayşe Yazıcı</div>
+    <div class="res-sub">${sub}</div>
+    <div class="sring" style="background:conic-gradient(var(--gold) ${deg}deg,var(--blue-pale) ${deg}deg)">
+      <div class="sinner">
+        <div class="sbig" id="scnum">0</div>
+        <div class="sden">/ ${total} doğru</div>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat g"><div class="v">${cor}</div><div class="l">Doğru ✓</div></div>
+      <div class="stat r"><div class="v">${total-cor}</div><div class="l">Yanlış ✗</div></div>
+      <div class="stat b"><div class="v">%${pct}</div><div class="l">Başarı</div></div>
+    </div>
+    <button class="rbtn" onclick="restartSec()">↩ Tekrar Çöz</button>
+    <button class="rbtn gold" onclick="switchSec(${other})">${other===2?'2. Bölüm ▶':'◀ 1. Bölüm'}</button>
+  `;
+  res.classList.add('show');
+  let n=0;const step=Math.max(1,Math.ceil(cor/25));
+  const iv=setInterval(()=>{n=Math.min(n+step,cor);document.getElementById('scnum').textContent=n;if(n>=cor)clearInterval(iv);},55);
+  if(pct>=55)confetti();
+}
+
+function restartSec(){
+  score[sec]=0;done[sec]=false;
+  arr().forEach(item=>delete ans[item.s]);
+  qi=0;
+  document.getElementById('card').style.display='block';
+  document.getElementById('results').classList.remove('show');
+  const d=document.getElementById('divlabel');if(d)d.remove();
+  renderQ();
+}
+
+function confetti(){
+  const cl=['#1e3a8a','#f59e0b','#3b82f6','#1a2f5e','#ffffff','#60a5fa','#fcd34d'];
+  const c=document.getElementById('cfc');c.innerHTML='';
+  for(let i=0;i<90;i++){
+    const p=document.createElement('div');p.className='cp';
+    p.style.cssText=`left:${Math.random()*100}%;top:${-5-Math.random()*25}px;background:${cl[i%cl.length]};animation-delay:${Math.random()*1.3}s;animation-duration:${2.2+Math.random()*1.6}s;width:${6+Math.random()*6}px;height:${10+Math.random()*8}px;transform:rotate(${Math.random()*360}deg)`;
+    c.appendChild(p);
+  }
+  setTimeout(()=>c.innerHTML='',5000);
+}
+
+switchSec(1);
+</script>
+</body>
+</html>
