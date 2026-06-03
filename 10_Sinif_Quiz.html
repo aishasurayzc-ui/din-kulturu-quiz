@@ -158,6 +158,27 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .cp{position:absolute;border-radius:2px;opacity:0;animation:cfF 2.8s ease-in forwards}
 @keyframes cfF{0%{opacity:1;transform:translateY(-10px) rotate(0)}80%{opacity:1}100%{opacity:0;transform:translateY(100vh) rotate(760deg)}}
 
+/* HOME SCREEN */
+.home-cards{display:flex;gap:14px;flex-wrap:wrap;max-width:700px}
+.hcard{flex:1;min-width:260px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 20px 20px;cursor:pointer;transition:all .22s;box-shadow:var(--sh);position:relative;overflow:hidden}
+.hcard::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue-lt),var(--gold))}
+.hcard:hover{border-color:rgba(245,158,11,.5);transform:translateY(-3px);box-shadow:0 14px 44px rgba(0,0,0,.65)}
+.hcard-icon{font-size:2.2rem;display:block;margin-bottom:8px}
+.hcard-num{font-size:.6rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.hcard-title{font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.15}
+.hcard-meta{display:flex;gap:8px;margin-bottom:10px}
+.hcard-meta span{font-size:.64rem;font-weight:700;color:var(--blue-lt);background:var(--blue-pale);padding:2px 9px;border-radius:20px}
+.hcard-prog{height:4px;background:var(--blue-pale);border-radius:2px;margin-bottom:12px;overflow:hidden}
+.hcard-prog-fill{height:100%;background:linear-gradient(90deg,var(--blue-lt),var(--gold));border-radius:2px;transition:width .5s;width:0%}
+.hcard-desc{font-size:.8rem;line-height:1.66;color:var(--dim2);margin-bottom:14px}
+.hcard-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
+.hchip{font-size:.62rem;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--card2);border:1px solid var(--border);color:var(--dim2)}
+.hcard-btn{width:100%;background:var(--blue);color:#fff;border:none;border-radius:9px;padding:10px;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .17s}
+.hcard-btn:hover{background:var(--blue-lt)}
+.home-lbl{font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:14px}
+.home-btn{background:none;border:1px solid var(--border);color:var(--dim2);font-size:.71rem;font-weight:600;padding:5px 10px;border-radius:7px;cursor:pointer;margin:0 8px 10px;width:calc(100% - 16px);transition:all .17s;text-align:left;display:flex;align-items:center;gap:5px}
+.home-btn:hover{background:var(--blue-pale);color:var(--text);border-color:var(--blue-lt)}
+
 /* MOBILE */
 .mob-toggle{display:none}
 @media(max-width:768px){
@@ -192,6 +213,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
   <!-- ═══ SIDEBAR ═══ -->
   <nav class="sidebar" id="sidebar">
     <div class="side-label">Konu Başlıkları</div>
+    <button class="home-btn" onclick="showHome()">⌂ &nbsp;Bölüm Seçimi</button>
 
     <!-- BÖLÜM 1 -->
     <div class="sec-item active" id="si1">
@@ -265,10 +287,59 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
   <!-- ═══ MAIN ═══ -->
   <main class="main-area">
-    <div class="prog-row">
+
+    <!-- ANA SAYFA -->
+    <div id="home-screen" style="display:none">
+      <div class="home-lbl">Bölüm Seçin</div>
+      <div class="home-cards">
+
+        <div class="hcard" onclick="startSection(1)">
+          <span class="hcard-icon">📖</span>
+          <div class="hcard-num">1. Bölüm</div>
+          <div class="hcard-title">Allah'ı Tanımak</div>
+          <div class="hcard-meta">
+            <span>50 Soru</span>
+            <span>4 Konu</span>
+          </div>
+          <div class="hcard-prog"><div class="hcard-prog-fill" id="hpb1"></div></div>
+          <div class="hcard-desc">Din kavramı ve kaynakları; Allah'ın varlığına dair deliller (kozmolojik, teleolojik, ontolojik ve dinî tecrübe); Kur'an'dan ayet delilleri; Allah'ın selbî, sübûtî ve haberî sıfatları ele alınmaktadır.</div>
+          <div class="hcard-chips">
+            <span class="hchip">Din &amp; Yorum</span>
+            <span class="hchip">Delil Türleri</span>
+            <span class="hchip">Kur'an'da Delil</span>
+            <span class="hchip">Allah'ın Sıfatları</span>
+          </div>
+          <button class="hcard-btn">Başla ▶</button>
+        </div>
+
+        <div class="hcard" onclick="startSection(2)">
+          <span class="hcard-icon">🕌</span>
+          <div class="hcard-num">2. Bölüm</div>
+          <div class="hcard-title">İslam'da Yorumlar</div>
+          <div class="hcard-meta">
+            <span>50 Soru</span>
+            <span>5 Konu</span>
+          </div>
+          <div class="hcard-prog"><div class="hcard-prog-fill" id="hpb2"></div></div>
+          <div class="hcard-desc">Mezhep, fırka, itikad ve fıkıh kavramları; mezheplerin ortaya çıkış sebepleri; Ehlisünnet ve Şia'nın siyasi-itikadi anlayışları; fıkıh mezheplerinin oluşumu ve mezhep türleri ele alınmaktadır.</div>
+          <div class="hcard-chips">
+            <span class="hchip">Temel Kavramlar</span>
+            <span class="hchip">Şia &amp; Ehlisünnet</span>
+            <span class="hchip">Paragraf Soruları</span>
+            <span class="hchip">Siyasi-İtikadi</span>
+            <span class="hchip">Mezhep Detayları</span>
+          </div>
+          <button class="hcard-btn">Başla ▶</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="prog-row" class="prog-row" style="display:none">
       <span class="qlabel" id="qlabel">Soru 1 / 50</span>
       <div class="prog-track"><div class="prog-fill" id="pfill"></div></div>
       <span class="spill" id="spill">✦ 0 doğru</span>
+      <button onclick="showHome()" title="Ana Sayfa" style="background:none;border:1px solid var(--border);color:var(--dim2);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:.72rem;flex-shrink:0">⌂</button>
     </div>
 
     <div class="card" id="card">
@@ -499,13 +570,30 @@ function jumpTo(s,qIdx){
   renderQ();
 }
 
-function switchSec(s){
+function showHome(){
+  document.getElementById('home-screen').style.display='block';
+  document.getElementById('prog-row').style.display='none';
+  document.getElementById('card').style.display='none';
+  document.getElementById('results').classList.remove('show');
+  [1,2].forEach(s=>{
+    const a=s===1?q1:q2;
+    const answered=a.filter(item=>ans[item.s]).length;
+    const bar=document.getElementById('hpb'+s);
+    if(bar)bar.style.width=(answered/a.length*100)+'%';
+  });
+}
+
+function startSection(s){
   sec=s;qi=0;
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('prog-row').style.display='flex';
   document.getElementById('card').style.display='block';
   document.getElementById('results').classList.remove('show');
   const d=document.getElementById('divlabel');if(d)d.remove();
   renderQ();
 }
+
+function switchSec(s){ startSection(s); }
 
 function renderQ(){
   const a=arr(),item=a[qi],total=a.length;
@@ -616,7 +704,7 @@ function showResults(){
   const deg=Math.round(cor/total*360);
   const other=sec===1?2:1;
   const res=document.getElementById('results');
-  res.innerHTML=`<span class="res-icon">${icon}</span><div class="res-title">${title}</div><div class="res-by">Hazırlayan: Ayşe Yazıcı</div><div class="res-sub">${sub}</div><div class="sring" style="background:conic-gradient(var(--gold) ${deg}deg,var(--blue-pale) ${deg}deg)"><div class="sinner"><div class="sbig" id="scnum">0</div><div class="sden">/ ${total} doğru</div></div></div><div class="stat-row"><div class="stat g"><div class="v">${cor}</div><div class="l">Doğru ✓</div></div><div class="stat r"><div class="v">${total-cor}</div><div class="l">Yanlış ✗</div></div><div class="stat b"><div class="v">%${pct}</div><div class="l">Başarı</div></div></div><button class="rbtn" onclick="restartSec()">↩ Tekrar Çöz</button><button class="rbtn gold" onclick="switchSec(${other})">${other===2?'2. Bölüm ▶':'◀ 1. Bölüm'}</button>`;
+  res.innerHTML=`<span class="res-icon">${icon}</span><div class="res-title">${title}</div><div class="res-by">Hazırlayan: Ayşe Yazıcı</div><div class="res-sub">${sub}</div><div class="sring" style="background:conic-gradient(var(--gold) ${deg}deg,var(--blue-pale) ${deg}deg)"><div class="sinner"><div class="sbig" id="scnum">0</div><div class="sden">/ ${total} doğru</div></div></div><div class="stat-row"><div class="stat g"><div class="v">${cor}</div><div class="l">Doğru ✓</div></div><div class="stat r"><div class="v">${total-cor}</div><div class="l">Yanlış ✗</div></div><div class="stat b"><div class="v">%${pct}</div><div class="l">Başarı</div></div></div><button class="rbtn" onclick="restartSec()">↩ Tekrar Çöz</button><button class="rbtn gold" onclick="switchSec(${other})">${other===2?'2. Bölüm ▶':'◀ 1. Bölüm'}</button><button class="rbtn" style="background:var(--card2);border:1px solid var(--border)" onclick="showHome()">⌂ Ana Sayfa</button>`;
   res.classList.add('show');
   let n=0;const step=Math.max(1,Math.ceil(cor/25));
   const iv=setInterval(()=>{n=Math.min(n+step,cor);document.getElementById('scnum').textContent=n;if(n>=cor)clearInterval(iv);},55);
@@ -642,7 +730,7 @@ function confetti(){
   setTimeout(()=>c.innerHTML='',5000);
 }
 
-switchSec(1);
+showHome();
 </script>
 </body>
 </html>
